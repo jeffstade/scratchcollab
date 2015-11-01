@@ -98,7 +98,7 @@ def create_csv_with_metadata():
 	output_file.close()
 
 
-## THREADS DATA
+## CREATING THREADS TABLE
 '''
 f = open("threads.csv","wb")
 output = csv.writer(f)
@@ -124,7 +124,7 @@ for i in range(1,226):
 f.close()
 '''
 
-## THREADS DATA
+## CREATING POSTS TABLE
 
 threads = []
 with open('threads.csv', 'rb') as f:
@@ -132,3 +132,31 @@ with open('threads.csv', 'rb') as f:
     for row in reader:
     	threads.append(row[0])
 
+f = open("posts.csv", "wb")
+output = csv.writer(f)
+for thread in threads:
+	threadURL = "https://scratch.mit.edu" + thread + "?page="
+	pageNumber = 1
+	totalPages = 1
+	while pageNumber <= totalPages:
+		site = parse_html("https://scratch.mit.edu" + thread + "?page="+ str(pageNumber))
+		if pageNumber == 1:
+			## Check to see what the total pages are and update var accordingly
+		posts = []## Get all of the posts in an array
+		for post in posts:
+			# Get Post ID
+			# Post Number
+ 			# Timestamp
+ 			# Post Content - No HTML
+ 			# Post Content - HTML
+ 			# User
+ 			# User Post Count
+ 			# Was Edited?
+ 			# Timestamp of edit
+ 			# Post Signature
+			## [Post ID, Thread ID (thread), Post #, Date, Post Content - No HTML, Post Content - HTML, User, User's Post Count, Edited?, Edit Date, Post Signature]
+			data = []
+			output.writerow([unicode(s).encode("utf-8") for s in data])
+		pageNumber += 1
+
+f.close()
