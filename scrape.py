@@ -11,6 +11,9 @@ import csv
 import sys
 import datetime
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 def parse_html(url):
 	req = urllib2.Request(url)
 	response = urllib2.urlopen(req)
@@ -141,21 +144,29 @@ for thread in threads:
 	while pageNumber <= totalPages:
 		site = parse_html("https://scratch.mit.edu" + thread + "?page="+ str(pageNumber))
 		if pageNumber == 1:
-			## Check to see what the total pages are and update var accordingly
-		posts = []## Get all of the posts in an array
+			pageList = site.find_all("a","page")
+			if (len(pageList)>0):
+				totalPages = site.find_all("a","page")[-1].text
+		posts = site.find_all("div","firstpost")
+		
 		for post in posts:
-			# Get Post ID
-			# Post Number
- 			# Timestamp
- 			# Post Content - No HTML
- 			# Post Content - HTML
- 			# User
- 			# User Post Count
- 			# Was Edited?
- 			# Timestamp of edit
+			print(post)
+			postID = post["id"]		# Get Post ID
+			postNumber = post.find("span","conr").text # Post Number
+ 			timestamp =  post.find("div","box-head").find("a").text # Timestamp
+ 			content = post.find("div","post_body_html")
+ 			contentNoHTML = content.text # Post Content - No HTML
+ 			contentHTML = str(content)[28:-6] # Post Content - HTML
+ 			user = post.find('a','username').text # User
+ 			postcount = re.sub("[\t\n ]","",post.find('div','postleft').text.replace("Scratcher","").replace(user,""))  # User Post Count
+			editedMessage = post.find("em","posteditmessage")
+			edited = True if editedMessage else False # Was Edited?
+			editDate = editedMessage.text[editedMessage.text.rfind("(")+1:-1] if edited else "" # Timestamp of edit
  			# Post Signature
-			## [Post ID, Thread ID (thread), Post #, Date, Post Content - No HTML, Post Content - HTML, User, User's Post Count, Edited?, Edit Date, Post Signature]
-			data = []
+ 			signature = post.find("div","postsignature")
+ 			signatureNoHTML =  signature.text if signature else ""
+ 			signatureHTML = str(signature)[27:-6] if signature else ""
+			data = [thread, postID, postNumber, timestamp, contentNoHTML, contentHTML, user, postcount, edited, editDate, signatureNoHTML, signatureHTML]
 			output.writerow([unicode(s).encode("utf-8") for s in data])
 		pageNumber += 1
 
